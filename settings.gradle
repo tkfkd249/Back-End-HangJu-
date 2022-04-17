@@ -1,0 +1,5 @@
+rootProject.name = 'hang'
+include 'hang-core'
+include 'hang-api'
+include 'hang-batch'
+

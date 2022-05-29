@@ -1,5 +1,11 @@
 package com.project.hang.api;
 
+import com.google.code.geocoder.Geocoder;
+import com.google.code.geocoder.GeocoderRequestBuilder;
+import com.google.code.geocoder.model.GeocodeResponse;
+import com.google.code.geocoder.model.GeocoderRequest;
+import org.json.simple.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -31,7 +37,6 @@ public class LHApi {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
-        System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -48,5 +53,42 @@ public class LHApi {
 
         return sb.toString();
     }
+    public String getLhHomeAdrees(JSONObject info) throws IOException{
 
+        StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B552555/lhLeaseNoticeDtlInfo1/getLeaseNoticeDtlInfo1"); /*URL*/
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=RqAc81%2FhL2dYXb2wAlZHqV0so079oKqXpk1n1jhanhCcgKxPtXuiGfwW3CbnLxbgNToHzkhJ7hezlfHM5c5wlA%3D%3D"); /*Service Key*/
+        urlBuilder.append("&" + URLEncoder.encode("SPL_INF_TP_CD","UTF-8") + "=" + URLEncoder.encode(info.get("SPL_INF_TP_CD").toString(), "UTF-8")); /*분양임대공고문조회 API의 특정 공고의 응답 메시지 중 공급정보구분코드*/
+        urlBuilder.append("&" + URLEncoder.encode("CCR_CNNT_SYS_DS_CD","UTF-8") + "=" + URLEncoder.encode(info.get("CCR_CNNT_SYS_DS_CD").toString(), "UTF-8")); /*분양임대공고문조회 API의 특정 공고의 응답 메시지 중 고객센터연계시스템구분코드*/
+        urlBuilder.append("&" + URLEncoder.encode("PAN_ID","UTF-8") + "=" + URLEncoder.encode(info.get("PAN_ID").toString(), "UTF-8")); /*분양임대공고문조회 API의 특정 공고의 응답 메시지 중 공고아이디*/
+        urlBuilder.append("&" + URLEncoder.encode("UPP_AIS_TP_CD","UTF-8") + "=" + URLEncoder.encode(info.get("UPP_AIS_TP_CD").toString(), "UTF-8")); /*분양임대공고문조회 API의 특정 공고의 응답 메시지 중 상위매물유형코드*/
+        urlBuilder.append("&" + URLEncoder.encode("AIS_TP_CD","UTF-8") + "=" + URLEncoder.encode(info.get("AIS_TP_CD").toString(), "UTF-8")); /*분양임대공고문조회 API의 특정 공고의 응답 메시지 중 매물유형코드*/
+
+        URL url = new URL(urlBuilder.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Content-type", "application/json");
+        BufferedReader rd;
+        if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        } else {
+            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+        }
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        rd.close();
+        conn.disconnect();
+        return sb.toString();
+    }
+
+    //일단 void로...
+    public void getLHHomeMapInfo(){
+        Geocoder geocoder = new Geocoder();
+        // setAddress : 변환하려는 주소 (경기도 성남시 분당구 등)
+        // setLanguate : 인코딩 설정
+        //GeocoderRequest geocoderRequest = new GeocoderRequestBuilder().setAddress(location).setLanguage("ko").getGeocoderRequest();
+        GeocodeResponse geocoderResponse;
+    }
 }

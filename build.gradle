@@ -42,12 +42,12 @@ subprojects {
 
 project(':hang-api') {
 	dependencies {
-		api project(':hang-core')
+		implementation project(':hang-core')
 	}
 }
 
 project(':hang-batch') {
 	dependencies {
-		api project(':hang-core')
+		implementation project(':hang-core')
 	}
 }

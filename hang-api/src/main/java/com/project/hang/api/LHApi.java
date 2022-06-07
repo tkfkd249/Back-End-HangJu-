@@ -30,7 +30,7 @@ public class LHApi {
         // urlBuilder.append("&" + URLEncoder.encode("PAN_NM","UTF-8") + "=" + URLEncoder.encode("대전", "UTF-8")); /*공고명으로 조회*/
         urlBuilder.append("&" + URLEncoder.encode("UPP_AIS_TP_CD","UTF-8") + "=" + URLEncoder.encode("06", "UTF-8")); /*공고유형코드*/
         // urlBuilder.append("&" + URLEncoder.encode("CNP_CD","UTF-8") + "=" + URLEncoder.encode("11", "UTF-8")); /*지역코드*/
-        urlBuilder.append("&" + URLEncoder.encode("PAN_SS","UTF-8") + "=" + URLEncoder.encode("공고중", "UTF-8")); /*공고상태코드*/
+        //urlBuilder.append("&" + URLEncoder.encode("PAN_SS","UTF-8") + "=" + URLEncoder.encode("공고중", "UTF-8")); /*공고상태코드*/
         // urlBuilder.append("&" + URLEncoder.encode("PAN_NT_ST_DT","UTF-8") + "=" + URLEncoder.encode("2019.07.23", "UTF-8")); /*공고게시일*/
         // urlBuilder.append("&" + URLEncoder.encode("CLSG_DT","UTF-8") + "=" + URLEncoder.encode("2019.08.22", "UTF-8")); /*공고마감일*/
         URL url = new URL(urlBuilder.toString());

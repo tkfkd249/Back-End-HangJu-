@@ -2,10 +2,9 @@ package com.project.hang.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "hang_master")
@@ -59,4 +58,9 @@ public class HangMaster {
     @Column(name = "PAN_DT")
     private String panDt; //모집공고일
 
+    @OneToMany
+    @JoinTable(
+            name = "DSSBD",
+            joinColumns = {@JoinColumn(name = "PAN_ID", referencedColumnName = "PAN_ID")})
+    private List<DsSbd> dsSbdList;
 }

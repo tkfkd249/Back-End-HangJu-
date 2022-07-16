@@ -58,9 +58,10 @@ public class HangMaster {
     @Column(name = "PAN_DT")
     private String panDt; //모집공고일
 
-    @OneToMany
-    @JoinTable(
-            name = "DSSBD",
-            joinColumns = {@JoinColumn(name = "PAN_ID", referencedColumnName = "PAN_ID")})
-    private List<DsSbd> dsSbdList;
+    @OneToOne
+    @JoinTable(name = "DSSBD", //조인테이블명
+            joinColumns = @JoinColumn(name="PAN_ID"),  //외래키
+            inverseJoinColumns = @JoinColumn(name="PAN_ID") //반대 엔티티의 외래키
+    )
+    private DsSbd dsSbd;
 }

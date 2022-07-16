@@ -48,44 +48,8 @@ public class MainController {
     }
 
     @GetMapping("/getAllList")
-    public ResponseEntity<String> getAllList() throws ParseException, IOException {
-
-        // 행복주택인 항목만 리턴해주기
-        // PAN_ID 구할 수 있음
-        LHApi lhApi = new LHApi();
-
-        String allResult = lhApi.getLhList();
-        JSONParser jsonParser = new JSONParser();
-        JSONArray jsonArray = (JSONArray)jsonParser.parse(allResult);
-        JSONObject jsonObject = (JSONObject) jsonArray.get(1);
-        JSONArray dsList = (JSONArray) jsonObject.get("dsList");
-
-        //AIS_TP_CD_NM이 행복주택인 항목만 꺼내기
-        JSONArray filterArray = new JSONArray();
-        for(int i=0;i<dsList.size();i++){
-            JSONObject obj = (JSONObject) dsList.get(i);
-            if(obj.get("AIS_TP_CD_NM").equals("행복주택")){
-                filterArray.add(dsList.get(i));
-            }
-        }
-
-        //해당항목 상세 주소 구해주기
-        JSONArray addrArray = new JSONArray();
-//        for(int i=0;i<filterArray.size();i++){
-//            JSONObject info = (JSONObject) filterArray.get(i);
-//            String addressInfo = lhApi.getLhDetailList(info);
-//            jsonArray = (JSONArray)jsonParser.parse(addressInfo);
-//            JSONObject infoAddr = (JSONObject) jsonArray.get(1);
-//            JSONArray list = (JSONArray) jsonObject.get("dsSch");
-//            addrArray.add(list);//LGDN_ADR,LGDN_DTL_ADR
-//        }
-
-        JSONArray returnArray = new JSONArray();
-        //Geocoder이용하여 위도, 경도 구해주기
-
-
-
-        return ResponseEntity.ok("test");
+    public ResponseEntity<List<HangMaster>> getHangMasterInfo() throws ParseException, IOException {
+        return ResponseEntity.ok().body(mainService.getHangMasterInfo());
     }
 
     @PostMapping("/insertHangInfo")
@@ -93,6 +57,7 @@ public class MainController {
 
         //마스터 정보 넣기
         mainService.deleteAllHangMaster();
+        mainService.deleteAllHangDetail();
         // 행복주택인 항목만 리턴해주기
         LHApi lhApi = new LHApi();
 
@@ -105,34 +70,8 @@ public class MainController {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<HangMasterDto> masterList = Arrays.asList(objectMapper.readValue(dsListStr, HangMasterDto[].class));
-        //obj.get("AIS_TP_CD_NM").equals("행복주택"
 
-        //AIS_TP_CD_NM이 행복주택인 항목만 꺼내기
-//        for(int i=0;i<dsList.size();i++){
-//            JSONObject obj = (JSONObject) dsList.get(i);
-//            if(obj.get("AIS_TP_CD_NM").equals("행복주택")){
-//
-//                HangMaster hangMaster = new HangMaster();
-//                hangMaster.setPanId(obj.get("PAN_ID").toString());
-//                hangMaster.setUppAisTpNm(obj.get("UPP_AIS_TP_NM").toString());
-//                hangMaster.setAisTpCdNm(obj.get("AIS_TP_CD_NM").toString());
-//                hangMaster.setPanNm(obj.get("PAN_NM").toString());
-//                hangMaster.setCnpCdNm(obj.get("CNP_CD_NM").toString());
-//                hangMaster.setPanNtStDt(obj.get("PAN_NT_ST_DT").toString());
-//                hangMaster.setClsgDt(obj.get("CLSG_DT").toString());
-//                hangMaster.setPanSs(obj.get("PAN_SS").toString());
-//                hangMaster.setDtlUrl(obj.get("DTL_URL").toString());
-//                hangMaster.setSplInfTpCd(obj.get("SPL_INF_TP_CD").toString());
-//                hangMaster.setCcrCnntSysDsCd(obj.get("CCR_CNNT_SYS_DS_CD").toString());
-//                hangMaster.setUppAisTpCd(obj.get("UPP_AIS_TP_CD").toString());
-//                hangMaster.setAisTpCd(obj.get("AIS_TP_CD").toString());
-//                hangMaster.setPanDt(obj.get("PAN_DT").toString());
-//
-//                masterList.add(hangMaster);
-//            }
-//        }
-//        mainService.insertHangMasterInfo(masterList);
-
+        mainService.insertHangMasterInfo(masterList);
         //세부정보
         for(int i=0;i<masterList.size();i++){
             String detaiilAll = lhApi.getLhDetailList(masterList.get(i));
@@ -141,72 +80,72 @@ public class MainController {
             JSONObject infoObj = (JSONObject) jsonArray.get(1);
 
             //주소
-            JSONArray dsSplScdlList = (JSONArray) infoObj.get("dsSbd");
-            for(int j=0;j<dsSplScdlList.size();j++){
+            if(infoObj.get("dsSbd") != null){
 
-                JSONObject obj = (JSONObject) dsSplScdlList.get(i);
-                String dsSbdStr = obj.toJSONString();
-                DsSbdDto dsSbdDto = objectMapper.readValue(dsSbdStr, DsSbdDto.class);
-                dsSbdDto.setPanId(masterList.get(i).getPanId());
-                dsSbdDto.setInfoIndex(j+"");
-//                dsSbd.setLgdnAdr(obj.get("LGDN_ADR").toString());
-//                dsSbd.setLgdnDtlAdr(obj.get("LGDN_DTL_ADR").toString());
-//                dsSbd.setDdoAr(obj.get("DDO_AR").toString());
-//                dsSbd.setHshCnt(obj.get("HSH_CNT").toString());
-//                dsSbd.setHtnFmlaDesc(obj.get("HTN_FMLA_DESC").toString());
-//                dsSbd.setMvinXpcYm(obj.get("MVIN_XPC_YM").toString());
+                JSONArray dsSplScdlList = (JSONArray) infoObj.get("dsSbd");
 
-                //위도, 경도 가져오기
-                try {
+                for(int j=0;j<dsSplScdlList.size();j++){
 
-                    String location = obj.get("LGDN_ADR").toString();
+                    JSONObject obj = (JSONObject) dsSplScdlList.get(j);
+                    String dsSbdStr = obj.toJSONString();
+                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    DsSbdDto dsSbdDto = objectMapper.readValue(dsSbdStr, DsSbdDto.class);
+                    dsSbdDto.setPanId(masterList.get(i).getPanId());
+                    dsSbdDto.setInfoIndex(j+"");
 
-                    String addr = "https://dapi.kakao.com/v2/local/search/address.json";
+                    //위도, 경도 가져오기
+                    try {
+                        String addr = "https://dapi.kakao.com/v2/local/search/address.json";
 
-                    String apiKey = "KakaoAK 7288796e557444ab852533e37aabdd5e";
+                        if(obj.get("LGDN_ADR") != null){
+                            String location = obj.get("LGDN_ADR").toString();
+                            location = URLEncoder.encode(location, "UTF-8");
 
-                    location = URLEncoder.encode(location, "UTF-8");
+                            String query = "query=" + location;
 
-                    String query = "query=" + location;
+                            StringBuffer stringBuffer = new StringBuffer();
+                            stringBuffer.append(addr);
+                            stringBuffer.append("?");
+                            stringBuffer.append(query);
 
-                    StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(addr);
-                    stringBuffer.append("?");
-                    stringBuffer.append(query);
+                            System.out.println("stringBuffer.toString() "+ stringBuffer.toString());
 
-                    System.out.println("stringBuffer.toString() "+ stringBuffer.toString());
+                            URL url = new URL(stringBuffer.toString());
 
-                    URL url = new URL(stringBuffer.toString());
+                            URLConnection conn = url.openConnection();
 
-                    URLConnection conn = url.openConnection();
+                            conn.setRequestProperty("Authorization", apiKey);
 
-                    conn.setRequestProperty("Authorization", apiKey);
+                            BufferedReader rd = null;
 
-                    BufferedReader rd = null;
+                            rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+                            StringBuffer docJson = new StringBuffer();
 
-                    rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-                    StringBuffer docJson = new StringBuffer();
+                            String line;
 
-                    String line;
+                            while((line=rd.readLine())!=null){
+                                docJson.append(line);
+                            }
 
-                    while((line=rd.readLine())!=null){
-                        docJson.append(line);
+                            rd.close();
+                            JSONParser paser = new JSONParser();
+                            if(docJson.length()>0){
+                                JSONObject docObj = (JSONObject) paser.parse(docJson.toString());
+                                JSONArray data = (JSONArray) docObj.get("documents");
+                                JSONObject jsonX = (JSONObject) data.get(0);
+                                dsSbdDto.setLatitude(jsonX.get("x").toString());
+                                dsSbdDto.setLongitude(jsonX.get("y").toString());
+                            }
+                        }
+
+
+                    }catch(Exception e) {
+                        e.printStackTrace();
                     }
 
-                    rd.close();
 
-                    if(docJson.length()>0){
-//
-//                        jsonArray = (JSONArray)jsonParser.parse(docJson.toString());
-//                        JSONObject docObj = (JSONObject) jsonArray.get(0).toString();
-//                        JSONObject tempObj = (JSONObject) jsonArray.get(0);
-//
-//                        System.out.println("latitude : " + tempObj.getDouble("y"));
-//                        System.out.println("longitude : " + tempObj.getDouble("x"));
-                    }
+                    mainService.insertDsSbdInfo(dsSbdDto);
 
-                }catch(Exception e) {
-                    e.printStackTrace();
                 }
 
             }

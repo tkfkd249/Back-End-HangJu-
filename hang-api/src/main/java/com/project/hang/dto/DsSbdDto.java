@@ -3,9 +3,11 @@ package com.project.hang.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.hang.entity.DsSbd;
 import lombok.*;
 
 import javax.persistence.Column;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,4 +46,5 @@ public class DsSbdDto {
 
     @JsonProperty(value = "LONGITUDE")
     private String longitude;
+
 }

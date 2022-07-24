@@ -15,6 +15,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,15 @@ import java.util.List;
 public class MainController {
 
     private final MainService mainService;
+
+    @Value("${apikey.master}")
+    private String master;
+
+    @Value("${apikey.detail}")
+    private String detail;
+
+    @Value("${apikey.kakao}")
+    private String kakao;
 
     public MainController(MainService mainService) {
         this.mainService = mainService;
@@ -61,7 +71,7 @@ public class MainController {
         // 행복주택인 항목만 리턴해주기
         LHApi lhApi = new LHApi();
 
-        String allResult = lhApi.getLhList();
+        String allResult = lhApi.getLhList(master);
         JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = (JSONArray)jsonParser.parse(allResult);
         JSONObject jsonObject = (JSONObject) jsonArray.get(1);
@@ -74,7 +84,7 @@ public class MainController {
         mainService.insertHangMasterInfo(masterList);
         //세부정보
         for(int i=0;i<masterList.size();i++){
-            String detaiilAll = lhApi.getLhDetailList(masterList.get(i));
+            String detaiilAll = lhApi.getLhDetailList(masterList.get(i),detail);
             JSONArray addrArray = new JSONArray();
             jsonArray = (JSONArray)jsonParser.parse(detaiilAll);
             JSONObject infoObj = (JSONObject) jsonArray.get(1);
@@ -96,6 +106,7 @@ public class MainController {
                     //위도, 경도 가져오기
                     try {
                         String addr = "https://dapi.kakao.com/v2/local/search/address.json";
+                        String apiKey = "KakaoAK "+ kakao;
 
                         if(obj.get("LGDN_ADR") != null){
                             String location = obj.get("LGDN_ADR").toString();

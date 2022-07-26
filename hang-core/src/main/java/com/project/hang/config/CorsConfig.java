@@ -19,7 +19,7 @@ public class CorsConfig {
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.setAllowedOrigins(List.of("http://localhost:8080"));
+        config.setAllowedOrigins(List.of("htt정p://localhost:8080"));
         config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedOrigins(List.of("http://129.154.195.162:8080"));
         config.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
